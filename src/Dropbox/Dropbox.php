@@ -1,5 +1,4 @@
 <?php
-
 namespace Kunnu\Dropbox;
 
 use Kunnu\Dropbox\Models\DeletedMetadata;
@@ -458,12 +457,18 @@ class Dropbox
             $path = "";
         }
 
-        //Set the path and query
-        $params['path'] = $path;
-        $params['query'] = $query;
+        $searchParams = [
+            'query' => $query,
+            'mode' => $params['mode'],
+            'options' => [
+                'path' => $path,
+                'max_results' => $params['max_results'],
+                'filename_only' => false,
+            ],
+        ];
 
         //Fetch Search Results
-        $response = $this->postToAPI('/files/search', $params);
+        $response = $this->postToAPI('/files/search_v2', $searchParams);
 
         //Make and Return the Model
         return $this->makeModelFromResponse($response);
@@ -504,7 +509,7 @@ class Dropbox
      *
      * @param  string $path Path to file/folder to delete
      *
-     * @return \Kunnu\Dropbox\Models\DeletedMetadata
+     * @return \Kunnu\Dropbox\Models\DeletedMetadata|\Kunnu\Dropbox\Models\FileMetadata|\Kunnu\Dropbox\Models\FolderMetadata
      *
      * @throws \Kunnu\Dropbox\Exceptions\DropboxClientException
      *
